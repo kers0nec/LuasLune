@@ -1,11 +1,11 @@
 {
   "name": "LuaLune — LuaLune Obfuscator",
   "short_name": "LuaLune",
-  "description": "Protect Lua and Luau scripts with the LuaLune Obfuscator.",
+  "description": "Protect Lua and Luau scripts with the LuaLune Protection Studio.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b0906",
-  "theme_color": "#f5c542",
+  "background_color": "#100d07",
+  "theme_color": "#efc75e",
   "icons": [
     { "src": "/logo.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
   ]
