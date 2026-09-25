@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LuaLune — Luau Protection & LuaLune Obfuscator</title>
-<meta name="theme-color" content="#0b0906">
-<meta name="description" content="LuaLune protects Lua and Luau scripts with the LuaLune Obfuscator: control flow flattening, identifier and string encryption, encrypted runtime payloads and one-line loader URLs.">
-<meta property="og:title" content="LuaLune — Luau Protection">
-<meta property="og:description" content="The LuaLune Obfuscator: encrypted payloads, control flow flattening, key systems and loader URLs.">
+<title>LuaLune — Lua &amp; Luau Protection Studio</title>
+<meta name="theme-color" content="#100d07">
+<meta name="description" content="Protect Lua and Luau scripts with randomized LuaLune obfuscation. Build, deliver and manage loaders, keys and access from one focused workspace.">
+<meta property="og:title" content="LuaLune — Lua &amp; Luau Protection Studio">
+<meta property="og:description" content="A focused workspace for randomized builds, protected loader delivery and key management.">
 <meta property="og:image" content="/logo-256.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/logo-64.png">
@@ -18,7 +18,10 @@
 <body>
 <div class="wrap">
   <header class="nav">
-    <div class="logo" onclick="go('home')"><img src="/logo-64.png" alt="LuaLune logo"><span>LuaLune</span></div>
+    <a class="logo" href="#" onclick="go('home');return false" aria-label="LuaLune home">
+      <img src="/logo-64.png" alt="">
+      <span class="logoWords"><strong>LuaLune</strong><small>PROTECTION STUDIO</small></span>
+    </a>
     <div class="navlinks">
       <button class="btn alt small" onclick="go('plans')">Plans</button>
       <button class="btn alt small" onclick="go('tos')">Terms</button>
@@ -30,90 +33,196 @@
 
   <!-- ---------------------------------------------------------------- home -->
   <section id="home">
-    <main class="hero">
-      <div class="heroGlow"></div>
-      <div class="logoMarkBig"><img src="/logo-256.png" alt=""></div>
-      <div class="pill">Luau protection &bull; randomized builds &bull; private delivery</div>
-      <div class="eyebrow" style="margin-top:22px">LuaLune Protection Engine</div>
-      <h1>Protect your <span>Luau</span> without the ugly stuff.</h1>
-      <p class="lead">Paste or drop your source, pick an engine, and get a fresh per-build loader. The <b>LuaLune Obfuscator</b> encrypts your payload with a new key every time; the <b>Flow</b> engine flattens control flow and rewrites identifiers, strings and numbers.</p>
-      <div class="row" style="justify-content:center;margin-top:26px">
-        <button class="btn" onclick="showAuth()">Open workspace</button>
-        <button class="btn alt" onclick="go('plans')">See plans</button>
+    <main class="hero heroSplit">
+      <div class="heroCopy">
+        <div class="pill"><span class="statusDot"></span> LUA &amp; LUAU PROTECTION <span class="pillDivider">/</span> PRIVATE DELIVERY</div>
+        <div class="eyebrow">LuaLune Protection Engine</div>
+        <h1>Keep your code yours. <span>Keep your edge.</span></h1>
+        <p class="lead">Protect Lua and Luau builds with randomized obfuscation, then manage loaders, keys and access from one focused workspace. Pick the protection layer that fits your script and get a fresh build every time.</p>
+        <div class="row heroActions">
+          <button class="btn" onclick="showAuth()">Open workspace <span class="btnArrow" aria-hidden="true">↗</span></button>
+          <button class="btn alt" onclick="go('plans')">Explore plans</button>
+        </div>
+        <div class="heroNotes">
+          <span><i>✦</i> Fresh output per build</span>
+          <span><i>⌁</i> Delivery and keys included</span>
+        </div>
+      </div>
+
+      <div class="heroVisual" aria-label="LuaLune build preview">
+        <div class="heroGlow"></div>
+        <div class="visual-window">
+          <div class="windowTop">
+            <div class="windowBrand"><img src="/logo-64.png" alt=""><span>LuaLune <i>/</i> Build studio</span></div>
+            <span class="previewBadge"><i></i> SYSTEM READY</span>
+          </div>
+          <div class="windowWorkspace">
+            <div><span class="miniEyebrow">CURRENT WORKSPACE</span><strong>Protected build</strong></div>
+            <span class="buildId">LL <i>/</i> 04–A17</span>
+          </div>
+          <div class="codeEditor">
+            <div class="codeEditorTop">
+              <span class="windowDots"><i></i><i></i><i></i></span>
+              <span>main.luau</span>
+              <span class="codeTag">LUAU</span>
+            </div>
+            <div class="codeLines" aria-hidden="true">
+              <div><em>01</em><code><span class="token-keyword">local</span> source = <span class="token-string">"your script"</span></code></div>
+              <div><em>02</em><code><span class="token-keyword">local</span> build = <span class="token-function">protect</span>(source, {</code></div>
+              <div><em>03</em><code>&nbsp;&nbsp;engine = <span class="token-string">"vault"</span>,</code></div>
+              <div><em>04</em><code>&nbsp;&nbsp;freshKeys = <span class="token-bool">true</span></code></div>
+              <div><em>05</em><code>})</code></div>
+              <div><em>06</em><code><span class="token-function">publish</span>(build.loader)</code></div>
+            </div>
+            <div class="editorCaption"><span class="editorPulse"></span> BUILD PREVIEW <span>·</span> RANDOMIZED OUTPUT</div>
+          </div>
+          <div class="previewStats">
+            <div><span>ENGINE</span><strong>Payload <i>＋</i> Vault</strong></div>
+            <div><span>DELIVERY</span><strong>Loader URL ready</strong></div>
+          </div>
+          <div class="previewFooter"><span><i></i> Integrity check enabled</span><strong>PROTECTED <b>✦</b></strong></div>
+        </div>
+        <div class="floatingNote noteTop"><span class="noteIcon">↻</span><span><b>Fresh output</b><small>New randomization each build</small></span></div>
+        <div class="floatingNote noteBottom"><span class="noteIcon">⌁</span><span><b>Access, on your terms</b><small>Keys · HWID · execution logs</small></span></div>
       </div>
     </main>
 
-    <section class="cards">
-      <div class="card"><div class="eyebrow">01</div><h3>LuaLune Obfuscator</h3><p>Randomized payload encryption, shuffled chunk delivery, an integrity check and a runtime decoder that rebuilds your chunk in memory.</p></div>
-      <div class="card"><div class="eyebrow">02</div><h3>Flow &amp; Vault</h3><p>Flow flattens control flow and rewrites identifiers, strings and numbers. Vault cascades three transforms with per-segment keys, decoy records and integrity checks.</p></div>
-      <div class="card"><div class="eyebrow">03</div><h3>Delivery built in</h3><p>Stable loader URLs, permanent or timed keys, HWID whitelists, execution logs and workspace sharing.</p></div>
+    <div class="proofbar" aria-label="LuaLune capabilities">
+      <span class="proofIntro">ONE WORKSPACE. FULL CONTROL.</span>
+      <span class="proofItem"><i>01</i> Encrypted payloads</span>
+      <span class="proofItem"><i>02</i> Lua + Luau engines</span>
+      <span class="proofItem"><i>03</i> Keys + loader delivery</span>
+    </div>
+
+    <section id="features" class="featureSection">
+      <div class="sectionHeading">
+        <div><div class="eyebrow">Built for the full release cycle</div><h2>Protection that fits your workflow.</h2></div>
+        <p>From the first transform to the final loader, keep your tools in one focused workspace.</p>
+      </div>
+      <div class="cards featureGrid">
+        <article class="card">
+          <div class="cardTop"><span class="featureIcon">01</span><span class="featureLabel">BUILD ENGINES</span></div>
+          <h3>Three ways to protect</h3>
+          <p>Choose the encrypted payload engine, source-to-source Flow, or layered Vault—then tune the passes for your script.</p>
+          <div class="cardFooter"><span>Payload</span><span>Flow</span><span>Vault</span></div>
+        </article>
+        <article class="card">
+          <div class="cardTop"><span class="featureIcon">02</span><span class="featureLabel">DELIVERY CONTROL</span></div>
+          <h3>Ship with confidence</h3>
+          <p>Keep a stable loader URL while managing timed keys, HWID whitelists, execution logs and workspace sharing.</p>
+          <div class="cardFooter"><span>Stable loaders</span><span>Key system</span></div>
+        </article>
+        <article class="card">
+          <div class="cardTop"><span class="featureIcon">03</span><span class="featureLabel">CAREFUL TRANSFORMS</span></div>
+          <h3>Built to fail safe</h3>
+          <p>Conservative passes verify their output. Unsupported syntax is skipped with a warning instead of silently shipping a broken build.</p>
+          <div class="cardFooter"><span>Integrity checks</span><span>Build warnings</span></div>
+        </article>
+      </div>
     </section>
 
-    <section class="cards" style="margin-top:16px">
-      <div class="card"><b>Never breaks your script</b><p>Each pass verifies the build, and anything that cannot be transformed safely is skipped with a warning instead of shipping a broken script.</p></div>
-      <div class="card"><b>Gold-standard accounts</b><p>Fast username sign-in, instant account creation, sessions and per-plan usage limits.</p></div>
-      <div class="card"><b>Honest promises</b><p>Obfuscation raises the cost of reading your source. It is not encryption of secrets — nothing that must stay confidential belongs in a script.</p></div>
+    <section class="workflowSection">
+      <div class="workflowCopy">
+        <div class="eyebrow">Clear by design</div>
+        <h2>From source to delivery in a few clicks.</h2>
+        <p>Drop in a Lua or Luau file, choose an engine and options, then manage the protected build from your workspace.</p>
+        <ol class="workflowList">
+          <li><span>01</span><div><b>Choose your layer</b><small>Balance runtime size, compatibility and protection style.</small></div></li>
+          <li><span>02</span><div><b>Review the build</b><small>See the passes, warnings and loader URL together.</small></div></li>
+          <li><span>03</span><div><b>Control access</b><small>Issue keys and keep your delivery settings in one place.</small></div></li>
+        </ol>
+      </div>
+      <div class="workflowCard">
+        <div class="workflowCardTop"><span><img src="/logo-64.png" alt=""> LuaLune workspace</span><span class="workspaceState"><i></i> READY</span></div>
+        <div class="workflowLabel">LATEST BUILD</div>
+        <div class="workflowBuild"><span class="buildGlyph">✦</span><span><b>my-script.luau</b><small>Vault engine <i>·</i> Integrity verified</small></span><span class="buildState">PROTECTED</span></div>
+        <div class="workflowLoader"><span>LOADER URL</span><code>https://your-domain/loader/••••••</code><b>↗</b></div>
+        <div class="workflowFoot"><span>Fresh key material</span><span>Output ready</span></div>
+      </div>
     </section>
+
+    <aside class="honestyBanner">
+      <span class="honestyMark">i</span>
+      <p><b>A useful layer—not a magic shield.</b> Obfuscation raises the cost of reading source; it is not encryption for secrets. Never put credentials in a script.</p>
+      <button class="linkbtn" onclick="go('tos')">Read the terms <span aria-hidden="true">↗</span></button>
+    </aside>
   </section>
 
   <!-- ---------------------------------------------------------------- auth -->
   <section id="auth" class="auth hidden">
-    <div class="panel">
-      <div class="tabs">
-        <button type="button" id="loginTab" class="tab active" onclick="setMode('login')">Sign in</button>
-        <button type="button" id="signupTab" class="tab" onclick="setMode('signup')">Create account</button>
+    <div class="authShell">
+      <aside class="authAside">
+        <div class="authMark"><img src="/logo-256.png" alt="LuaLune"></div>
+        <div class="eyebrow">Your LuaLune workspace</div>
+        <h2>Build privately. <span>Ship confidently.</span></h2>
+        <p>Sign in to protect a script, review your builds and manage delivery from one calm, focused space.</p>
+        <div class="authAsideFoot"><span class="statusDot"></span> Lua and Luau protection, ready when you are.</div>
+      </aside>
+      <div class="panel authPanel">
+        <div class="tabs">
+          <button type="button" id="loginTab" class="tab active" onclick="setMode('login')">Sign in</button>
+          <button type="button" id="signupTab" class="tab" onclick="setMode('signup')">Create account</button>
+        </div>
+        <form id="authForm">
+          <div class="eyebrow">Account</div>
+          <h2 id="authTitle">Sign in</h2>
+          <div id="usernameWrap">
+            <label>Username</label>
+            <input id="username" autocomplete="username" minlength="3" maxlength="24" placeholder="your_username" required>
+          </div>
+          <label>Password</label>
+          <input id="password" type="password" autocomplete="current-password" minlength="8" required>
+          <div id="tosWrap" class="hidden">
+            <label class="row" style="align-items:flex-start">
+              <input id="agree" type="checkbox" checked>
+              <span class="small">I have read and accept the <a href="#" onclick="go('tos');return false">LuaLune Terms of Service</a>.</span>
+            </label>
+          </div>
+          <div id="authMsg" class="msg muted"></div>
+          <div class="row between authHelp" style="margin-top:14px">
+            <span class="muted small">Use your LuaLune username to sign in.</span>
+            <button type="button" class="linkbtn" onclick="forgotPassword()">Forgot password?</button>
+          </div>
+          <button type="submit" class="btn" id="authBtn">Sign in</button>
+        </form>
       </div>
-      <form id="authForm">
-        <div class="eyebrow">Account</div>
-        <h2 id="authTitle">Sign in</h2>
-        <div id="usernameWrap">
-          <label>Username</label>
-          <input id="username" autocomplete="username" minlength="3" maxlength="24" placeholder="your_username" required>
-        </div>
-        <label>Password</label>
-        <input id="password" type="password" autocomplete="current-password" minlength="8" required>
-        <div id="tosWrap" class="hidden">
-          <label class="row" style="align-items:flex-start">
-            <input id="agree" type="checkbox" checked>
-            <span class="small">I have read and accept the <a href="#" onclick="go('tos');return false">LuaLune Terms of Service</a>.</span>
-          </label>
-        </div>
-        <div id="authMsg" class="msg muted"></div>
-        <div class="row between" style="margin-top:14px">
-          <span class="muted small">Use your LuaLune username to sign in.</span>
-          <button type="button" class="linkbtn" onclick="forgotPassword()">Forgot password?</button>
-        </div>
-        <button type="submit" class="btn" style="width:100%;margin-top:8px" id="authBtn">Sign in</button>
-      </form>
     </div>
   </section>
 
   <!-- ----------------------------------------------------------- dashboard -->
   <section id="dashboard" class="dash hidden">
-    <div class="row between">
-      <div>
-        <h2 style="margin:0">Dashboard</h2>
-        <div class="muted" id="who"></div>
-      </div>
-      <div class="row">
-        <span class="chip gold" id="planChip">free</span>
-        <button class="btn alt" onclick="logout()">Log out</button>
-      </div>
-    </div>
+    <div class="dashboardShell">
+      <aside class="dashboardSidebar">
+        <div class="dashboardBrand"><img src="/logo-64.png" alt=""><span><strong>LuaLune</strong><small>PROTECTION STUDIO</small></span></div>
+        <div class="sideNavLabel">WORKSPACE</div>
+        <nav class="dashTabs" aria-label="Workspace sections">
+          <button class="btn small" onclick="tab('build')" id="tab-build"><span class="sideIcon">✦</span><span>Build</span></button>
+          <button class="btn alt small" onclick="tab('scripts')" id="tab-scripts"><span class="sideIcon">▤</span><span>Scripts</span></button>
+          <button class="btn alt small" onclick="tab('keys')" id="tab-keys"><span class="sideIcon">⌁</span><span>Key system</span></button>
+          <button class="btn alt small" onclick="tab('workspace')" id="tab-workspace"><span class="sideIcon">◇</span><span>Workspace</span></button>
+          <button class="btn alt small" onclick="tab('account')" id="tab-account"><span class="sideIcon">◎</span><span>Account</span></button>
+          <button class="btn alt small hidden" onclick="tab('admin')" id="tab-admin"><span class="sideIcon">✣</span><span>Admin</span></button>
+        </nav>
+        <div class="sidebarStatus"><span class="statusDot"></span><span><b>All systems ready</b><small>Lua + Luau engines</small></span></div>
+      </aside>
 
-    <div class="grid" style="margin-top:18px">
-      <div class="stat"><div class="muted small">Builds this month</div><div class="metric" id="usageMetric">–</div><div class="muted tiny" id="usageNote"></div></div>
-      <div class="stat"><div class="muted small">Your scripts</div><div class="metric" id="scriptMetric">–</div><div class="muted tiny" id="scriptNote"></div></div>
-    </div>
+      <div class="dashboardMain">
+        <div class="row between dashHeader">
+          <div>
+            <div class="eyebrow">WORKSPACE OVERVIEW</div>
+            <h2 style="margin:5px 0 0">Dashboard</h2>
+            <div class="muted" id="who"></div>
+          </div>
+          <div class="row">
+            <span class="chip gold" id="planChip">free</span>
+            <button class="btn alt" onclick="logout()">Log out</button>
+          </div>
+        </div>
 
-    <nav class="row" style="margin:22px 0 8px">
-      <button class="btn small" onclick="tab('build')" id="tab-build">Build</button>
-      <button class="btn alt small" onclick="tab('scripts')" id="tab-scripts">Scripts</button>
-      <button class="btn alt small" onclick="tab('keys')" id="tab-keys">Key system</button>
-      <button class="btn alt small" onclick="tab('workspace')" id="tab-workspace">Workspace</button>
-      <button class="btn alt small" onclick="tab('account')" id="tab-account">Account</button>
-      <button class="btn alt small hidden" onclick="tab('admin')" id="tab-admin">Admin</button>
-    </nav>
+        <div class="grid statGrid" style="margin-top:18px">
+          <div class="stat"><div class="muted small">Builds this month</div><div class="metric" id="usageMetric">–</div><div class="muted tiny" id="usageNote"></div></div>
+          <div class="stat"><div class="muted small">Your scripts</div><div class="metric" id="scriptMetric">–</div><div class="muted tiny" id="scriptNote"></div></div>
+        </div>
 
     <!-- build -->
     <div id="pane-build" class="grid">
@@ -273,14 +382,16 @@
         <div id="users" class="small muted" style="margin-top:12px">Loading…</div>
       </div>
     </div>
+      </div>
+    </div>
   </section>
 
   <!-- ---------------------------------------------------------------- plans -->
   <section id="plans" class="hidden">
-    <div class="hero" style="padding-bottom:20px">
-      <div class="eyebrow">Pricing</div>
-      <h1 style="font-size:clamp(34px,5vw,54px)">One-time <span>gold</span> access</h1>
-      <p class="lead">No subscriptions. Buy a plan once, keep the limits until you change them.</p>
+    <div class="hero pricingHero">
+      <div class="eyebrow">PLANS &amp; LIMITS</div>
+      <h1>Simple tiers. <span>Room to grow.</span></h1>
+      <p class="lead">Compare build, script and key limits, then choose the workspace tier that fits your release pace.</p>
     </div>
     <div class="plans" id="planList"></div>
   </section>

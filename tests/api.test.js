@@ -300,7 +300,9 @@ test("the gold dashboard is served with the LuaLune brand and no discord links",
   assert.equal(page.status, 200);
   assert.match(html, /LuaLune Obfuscator/);
   assert.match(html, /\/styles\.css/);
-  assert.match(html, /\/logo-256\.png/, "hero logo missing");
+  assert.match(html, /class="hero heroSplit"/, "new landing hero missing");
+  assert.match(html, /class="dashboardSidebar"/, "workspace sidebar missing");
+  assert.match(html, /\/logo-256\.png/, "large LuaLune logo missing");
   assert.match(html, /\/logo-64\.png/, "nav logo missing");
   assert.ok(!/discord/i.test(html), "discord must not appear in the app");
   assert.match(html, /<button type="button" id="loginTab"/, "sign-in tab must not submit the auth form");
@@ -309,7 +311,7 @@ test("the gold dashboard is served with the LuaLune brand and no discord links",
   assert.match(html, /<button type="submit" class="btn"[^>]*id="authBtn"/, "auth action must submit the form");
 
   const css = await (await fetch(`${base}/styles.css`)).text();
-  assert.match(css, /#f5c542/, "gold accent missing");
+  assert.match(css, /--gold:\s*#e9c15b/i, "gold accent missing");
 
   const logo = await fetch(`${base}/logo.png`);
   assert.equal(logo.status, 200);
@@ -321,7 +323,7 @@ test("the gold dashboard is served with the LuaLune brand and no discord links",
 
   const manifest = await (await fetch(`${base}/manifest.json`)).json();
   assert.match(manifest.name, /LuaLune/);
-  assert.equal(manifest.theme_color, "#f5c542");
+  assert.equal(manifest.theme_color, "#efc75e");
 });
 
 test("unknown routes fall back to the app, api routes 404 as json", async () => {
