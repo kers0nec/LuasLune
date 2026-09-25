@@ -1,12 +1,17 @@
 {
-  "name": "LuaLune — LuaLune Obfuscator",
+  "name": "LuaLune Obfuscator",
   "short_name": "LuaLune",
-  "description": "Protect Lua and Luau scripts with the LuaLune Protection Studio.",
+  "description": "Protect Lua and Luau scripts with the Prometheus obfuscator. Free and unlimited.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#100d07",
   "theme_color": "#efc75e",
   "icons": [
-    { "src": "/logo.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+    {
+      "src": "/logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

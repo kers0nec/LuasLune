@@ -23,7 +23,6 @@
       <span class="logoWords"><strong>LuaLune</strong><small>PROTECTION STUDIO</small></span>
     </a>
     <div class="navlinks">
-      <button class="btn alt small" onclick="go('plans')">Plans</button>
       <button class="btn alt small" onclick="go('tos')">Terms</button>
       <div id="navActions"></div>
     </div>
@@ -38,14 +37,14 @@
         <div class="pill"><span class="statusDot"></span> LUA &amp; LUAU PROTECTION <span class="pillDivider">/</span> PRIVATE DELIVERY</div>
         <div class="eyebrow">LuaLune Protection Engine</div>
         <h1>Keep your code yours. <span>Keep your edge.</span></h1>
-        <p class="lead">Protect Lua and Luau builds with randomized obfuscation, then manage loaders, keys and access from one focused workspace. Pick the protection layer that fits your script and get a fresh build every time.</p>
+        <p class="lead">Protect Lua and Luau builds with the Prometheus engine, then manage loaders, keys and access from one focused workspace. Free and unlimited — pick a protection profile, build, and get a freshly randomized output every time.</p>
         <div class="row heroActions">
           <button class="btn" onclick="showAuth()">Open workspace <span class="btnArrow" aria-hidden="true">↗</span></button>
-          <button class="btn alt" onclick="go('plans')">Explore plans</button>
+          <button class="btn alt" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">See capabilities</button>
         </div>
         <div class="heroNotes">
           <span><i>✦</i> Fresh output per build</span>
-          <span><i>⌁</i> Delivery and keys included</span>
+          <span><i>⌁</i> Unlimited scripts, keys and logs</span>
         </div>
       </div>
 
@@ -69,7 +68,7 @@
             <div class="codeLines" aria-hidden="true">
               <div><em>01</em><code><span class="token-keyword">local</span> source = <span class="token-string">"your script"</span></code></div>
               <div><em>02</em><code><span class="token-keyword">local</span> build = <span class="token-function">protect</span>(source, {</code></div>
-              <div><em>03</em><code>&nbsp;&nbsp;engine = <span class="token-string">"vault"</span>,</code></div>
+              <div><em>03</em><code>&nbsp;&nbsp;profile = <span class="token-string">"medium"</span>,</code></div>
               <div><em>04</em><code>&nbsp;&nbsp;freshKeys = <span class="token-bool">true</span></code></div>
               <div><em>05</em><code>})</code></div>
               <div><em>06</em><code><span class="token-function">publish</span>(build.loader)</code></div>
@@ -77,7 +76,7 @@
             <div class="editorCaption"><span class="editorPulse"></span> BUILD PREVIEW <span>·</span> RANDOMIZED OUTPUT</div>
           </div>
           <div class="previewStats">
-            <div><span>ENGINE</span><strong>Payload <i>＋</i> Vault</strong></div>
+            <div><span>ENGINE</span><strong>Prometheus <i>·</i> Luau</strong></div>
             <div><span>DELIVERY</span><strong>Loader URL ready</strong></div>
           </div>
           <div class="previewFooter"><span><i></i> Integrity check enabled</span><strong>PROTECTED <b>✦</b></strong></div>
@@ -89,8 +88,8 @@
 
     <div class="proofbar" aria-label="LuaLune capabilities">
       <span class="proofIntro">ONE WORKSPACE. FULL CONTROL.</span>
-      <span class="proofItem"><i>01</i> Encrypted payloads</span>
-      <span class="proofItem"><i>02</i> Lua + Luau engines</span>
+      <span class="proofItem"><i>01</i> AST-level obfuscation</span>
+      <span class="proofItem"><i>02</i> Luau output</span>
       <span class="proofItem"><i>03</i> Keys + loader delivery</span>
     </div>
 
@@ -101,10 +100,10 @@
       </div>
       <div class="cards featureGrid">
         <article class="card">
-          <div class="cardTop"><span class="featureIcon">01</span><span class="featureLabel">BUILD ENGINES</span></div>
-          <h3>Three ways to protect</h3>
-          <p>Choose the encrypted payload engine, source-to-source Flow, or layered Vault—then tune the passes for your script.</p>
-          <div class="cardFooter"><span>Payload</span><span>Flow</span><span>Vault</span></div>
+          <div class="cardTop"><span class="featureIcon">01</span><span class="featureLabel">BUILD ENGINE</span></div>
+          <h3>Prometheus, tuned per script</h3>
+          <p>Every build runs through Prometheus: string encryption, VM wrapping, constant shuffling and control-flow work — Minify through Strong.</p>
+          <div class="cardFooter"><span>Minify</span><span>Medium</span><span>Strong</span></div>
         </article>
         <article class="card">
           <div class="cardTop"><span class="featureIcon">02</span><span class="featureLabel">DELIVERY CONTROL</span></div>
@@ -115,8 +114,8 @@
         <article class="card">
           <div class="cardTop"><span class="featureIcon">03</span><span class="featureLabel">CAREFUL TRANSFORMS</span></div>
           <h3>Built to fail safe</h3>
-          <p>Conservative passes verify their output. Unsupported syntax is skipped with a warning instead of silently shipping a broken build.</p>
-          <div class="cardFooter"><span>Integrity checks</span><span>Build warnings</span></div>
+          <p>Prometheus parses your script before it rewrites anything. Anything it cannot translate is reported instead of silently shipping a broken build.</p>
+          <div class="cardFooter"><span>Parse checks</span><span>Build reports</span></div>
         </article>
       </div>
     </section>
@@ -125,9 +124,9 @@
       <div class="workflowCopy">
         <div class="eyebrow">Clear by design</div>
         <h2>From source to delivery in a few clicks.</h2>
-        <p>Drop in a Lua or Luau file, choose an engine and options, then manage the protected build from your workspace.</p>
+        <p>Drop in a Lua or Luau file, choose a protection profile, then manage the protected build from your workspace.</p>
         <ol class="workflowList">
-          <li><span>01</span><div><b>Choose your layer</b><small>Balance runtime size, compatibility and protection style.</small></div></li>
+          <li><span>01</span><div><b>Choose your profile</b><small>Balance runtime size, compatibility and protection strength.</small></div></li>
           <li><span>02</span><div><b>Review the build</b><small>See the passes, warnings and loader URL together.</small></div></li>
           <li><span>03</span><div><b>Control access</b><small>Issue keys and keep your delivery settings in one place.</small></div></li>
         </ol>
@@ -135,7 +134,7 @@
       <div class="workflowCard">
         <div class="workflowCardTop"><span><img src="/logo-64.png" alt=""> LuaLune workspace</span><span class="workspaceState"><i></i> READY</span></div>
         <div class="workflowLabel">LATEST BUILD</div>
-        <div class="workflowBuild"><span class="buildGlyph">✦</span><span><b>my-script.luau</b><small>Vault engine <i>·</i> Integrity verified</small></span><span class="buildState">PROTECTED</span></div>
+        <div class="workflowBuild"><span class="buildGlyph">✦</span><span><b>my-script.luau</b><small>Prometheus <i>·</i> Medium profile</small></span><span class="buildState">PROTECTED</span></div>
         <div class="workflowLoader"><span>LOADER URL</span><code>https://your-domain/loader/••••••</code><b>↗</b></div>
         <div class="workflowFoot"><span>Fresh key material</span><span>Output ready</span></div>
       </div>
@@ -214,7 +213,7 @@
             <div class="muted" id="who"></div>
           </div>
           <div class="row">
-            <span class="chip gold" id="planChip">free</span>
+            <span class="chip gold" id="planChip">unlimited</span>
             <button class="btn alt" onclick="logout()">Log out</button>
           </div>
         </div>
@@ -240,11 +239,18 @@
           <div>
             <label>Upload a file</label>
             <input id="scriptFile" type="file" accept=".lua,.luau,.txt" class="small">
-            <div class="muted tiny">Only .lua, .luau and .txt files, max 2 MB.</div>
+            <div class="muted tiny">Only .lua, .luau and .txt files, max 500 KB.</div>
           </div>
         </div>
-        <label>Options</label>
-        <div class="toggles" id="options"></div>
+        <label>Protection profile</label>
+        <div class="engines" id="profilePicker"></div>
+        <div class="muted tiny" id="profileNote"></div>
+        <div class="toggles">
+          <label class="toggle on" id="hardenToggle">
+            <input type="checkbox" id="harden" checked>
+            <span>Anti-tamper</span>
+          </label>
+        </div>
         <label class="row" style="margin-top:14px"><input id="keyRequired" type="checkbox"> <span class="small">Require a key before this script loads</span></label>
         <div id="createMsg" class="msg muted"></div>
         <button class="btn" style="margin-top:8px" id="buildBtn" onclick="createScript()">Obfuscate</button>
@@ -270,16 +276,13 @@
           <button class="btn alt small" onclick="closeEdit()">Close</button>
         </div>
         <div class="muted small">Upload or paste the new source. The loader URL and keys stay exactly the same — only the protected build is replaced.</div>
-        <label>New source file <span class="muted small">(.lua, .luau, .txt — max 2 MB)</span></label>
+        <label>New source file <span class="muted small">(.lua, .luau, .txt — max 500 KB)</span></label>
         <input id="editFile" type="file" accept=".lua,.luau,.txt" class="small">
         <label>Or paste it</label>
         <textarea id="editSource" placeholder="-- new version of your script"></textarea>
         <label>Engine</label>
         <select id="editEngine">
-          <option value="payload">LuaLune Obfuscator</option>
-          <option value="flow">LuaLune Obfuscator - Flow</option>
-          <option value="vault">LuaLune Obfuscator - Vault</option>
-          <option value="lune">Lune Obfuscator</option>
+          <option value="prometheus">Prometheus</option>
           <option value="none">None</option>
         </select>
         <div id="editMsg" class="msg muted"></div>
@@ -314,14 +317,7 @@
     <div id="pane-workspace" class="grid hidden">
       <div class="panel">
         <h3>Invite codes</h3>
-        <p class="muted small">Create a code and send it to a teammate. Plan invites move an account onto a paid plan; workspace invites grant access.</p>
-        <label>Type</label>
-        <select id="inviteKind">
-          <option value="workspace">Workspace access</option>
-          <option value="plan">Plan upgrade</option>
-        </select>
-        <label>Plan <span class="muted small">(for plan invites)</span></label>
-        <select id="invitePlan"><option value="pro">Pro</option><option value="premium">Premium</option></select>
+        <p class="muted small">Create a code and send it to a teammate. Redeeming it grants workspace access to the script you pick.</p>
         <label>Max uses</label>
         <input id="inviteUses" type="number" min="1" max="100" value="1">
         <div id="inviteMsg" class="msg muted"></div>
@@ -330,7 +326,7 @@
       </div>
       <div class="panel">
         <h3>Sharing</h3>
-        <p class="muted small">Share a script with another LuaLune account. Sharing is available on Pro and Premium.</p>
+        <p class="muted small">Share a script with another LuaLune account. They get read access to the build and its loader URL.</p>
         <label>Username</label>
         <input id="shareUser" placeholder="teammate">
         <label>Script</label>
@@ -386,16 +382,6 @@
     </div>
   </section>
 
-  <!-- ---------------------------------------------------------------- plans -->
-  <section id="plans" class="hidden">
-    <div class="hero pricingHero">
-      <div class="eyebrow">PLANS &amp; LIMITS</div>
-      <h1>Simple tiers. <span>Room to grow.</span></h1>
-      <p class="lead">Compare build, script and key limits, then choose the workspace tier that fits your release pace.</p>
-    </div>
-    <div class="plans" id="planList"></div>
-  </section>
-
   <!-- ------------------------------------------------------------------ tos -->
   <section id="tos" class="hidden">
     <div class="panel tos" style="max-width:820px;margin:34px auto">
@@ -410,7 +396,7 @@
   <footer>
     <div>
       <span>&copy; <span id="year"></span> LuaLune — <span id="footerTag">LuaLune Obfuscator</span></span>
-      <div class="tiny muted-2" id="engineAttribution" style="margin-top:6px"></div>
+      <div class="tiny muted-2" id="engineAttribution" style="margin-top:6px">Based on Prometheus by Elias Oelschner, <a href="https://github.com/prometheus-lua/Prometheus" target="_blank" rel="noreferrer">https://github.com/prometheus-lua/Prometheus</a></div>
     </div>
     <span class="row"><a href="/api/meta">API</a><span class="muted-2">•</span><a href="#" onclick="go('tos');return false">Terms</a><span class="muted-2">•</span><a href="/healthz">Status</a></span>
   </footer>
@@ -421,8 +407,9 @@
 const state = {
   token: localStorage.getItem("lualune_token") || null,
   user: null, profile: null, meta: null,
-  engine: "payload",
-  options: { rename: true, strings: true, numbers: true, junk: true, flatten: true, harden: true },
+  engine: "prometheus",
+  profile: "medium",
+  harden: true,
   scripts: [], keys: [], durations: [], invites: [], shares: [],
   mode: "login",
   activePane: "build",
@@ -459,11 +446,10 @@ async function api(path, { method = "GET", body, text } = {}) {
 }
 
 /* --------------------------------------------------------- navigation */
-const PAGES = ["home", "auth", "dashboard", "plans", "tos"];
+const PAGES = ["home", "auth", "dashboard", "tos"];
 function go(page) {
   PAGES.forEach((p) => $(p).classList.toggle("hidden", p !== page));
   if (page === "dashboard" && !state.token) return go("home");
-  if (page === "plans") renderPlans();
   if (page === "tos") renderTos();
   window.scrollTo({ top: 0 });
 }
@@ -491,7 +477,7 @@ async function boot() {
   await loadMeta();
   loadAnnouncements();
   renderEnginePicker();
-  renderOptions();
+  renderProfilePicker();
   renderNav();
   if (state.token) {
     try {
@@ -521,10 +507,12 @@ async function loadMeta() {
   if (state.meta) {
     document.title = "LuaLune — " + state.meta.product;
     $("footerTag").textContent = state.meta.product;
-    if ((state.meta.engines || []).some((e) => e.id === "lune")) {
-      const att = $("engineAttribution");
-      att.innerHTML = "Lune Obfuscator engine based on Prometheus by Elias Oelschner — " +
-        '<a href="https://github.com/prometheus-lua/Prometheus" target="_blank" rel="noreferrer">source</a> (MIT).';
+    // Attribution wording is required verbatim by the Prometheus license, so it
+    // comes from the server and only the URL is turned into a link.
+    if (state.meta.attribution) {
+      const url = state.meta.engineUpstream || "https://github.com/prometheus-lua/Prometheus";
+      const link = '<a href="' + esc(url) + '" target="_blank" rel="noreferrer">' + esc(url) + "</a>";
+      $("engineAttribution").innerHTML = esc(state.meta.attribution).split(esc(url)).join(link);
     }
   }
 }
@@ -535,34 +523,6 @@ async function loadAnnouncements() {
     $("announcements").innerHTML = (data.announcements || []).map((a) =>
       '<div class="announce"><b>' + esc(a.title) + '</b><div class="small muted">' + esc(a.body) + '</div></div>').join("");
   } catch { /* announcements are optional */ }
-}
-
-/* ------------------------------------------------------------------ plans */
-function renderPlans() {
-  const plans = state.meta?.plans || [];
-  $("planList").innerHTML = plans.map((p) => `
-    <div class="plan ${p.id === "premium" ? "featured" : ""}">
-      ${p.id === "premium" ? '<span class="chip gold badge">Best value</span>' : ""}
-      <div class="eyebrow">${esc(p.name)}</div>
-      <div class="price">${p.price === 0 ? "Free" : "$" + p.price}<span class="muted small"> ${p.price === 0 ? "" : "· one-time payment"}</span></div>
-      <div class="muted small" style="margin-top:6px">${esc(p.blurb)}</div>
-      <ul>${p.features.map((f) => "<li>" + esc(f) + "</li>").join("")}</ul>
-      <div class="small muted" style="margin-top:14px">
-        ${p.limits.scripts === -1 ? "Unlimited" : p.limits.scripts} scripts &middot;
-        ${p.limits.obfuscationsPerMonth === -1 ? "unlimited" : p.limits.obfuscationsPerMonth} builds / month &middot;
-        ${p.limits.keys === -1 ? "unlimited" : p.limits.keys} keys
-      </div>
-      <button class="btn ${p.id === "free" ? "alt" : ""}" style="margin-top:16px;width:100%" onclick="${state.token ? `inviteFor('${p.id}')` : "showAuth('signup')"}">
-        ${p.id === "free" ? (state.token ? "Current tier" : "Start free") : "Get " + esc(p.name)}
-      </button>
-    </div>`).join("");
-}
-function inviteFor(plan) {
-  if (!state.token) return showAuth("signup");
-  tab("workspace");
-  $("inviteKind").value = "plan";
-  $("invitePlan").value = plan;
-  setMsg($("inviteMsg"), "Create an invite code for the " + plan + " plan and send it to whoever needs it.", "muted");
 }
 
 /* -------------------------------------------------------------------- tos */
@@ -746,25 +706,16 @@ function renderAccount({ user, profile, usage }) {
   state.profile = profile || state.profile;
   if (!state.user || !state.profile) return;
   $("who").textContent = "@" + state.user.username;
-  $("planChip").textContent = state.profile.plan || "free";
+  $("planChip").textContent = "unlimited";
   const isAdmin = state.profile.role === "admin";
   $("tab-admin").classList.toggle("hidden", !isAdmin);
 
-  // Usage metrics
+  // Usage counters. There are no caps — these are informational only.
   if (usage) {
-    const limitValue = usage.limit;
-    const used = usage.count || 0;
-    $("usageMetric").textContent = limitValue === -1 ? "Unlimited" : (used + " / " + limitValue);
-    $("usageNote").textContent = limitValue === -1
-      ? "No build cap on the " + state.profile.plan + " plan."
-      : "Resets on the 1st of each month.";
-
-    const scriptLimit = (state.meta?.plans || []).find((p) => p.id === state.profile.plan)?.limits?.scripts;
-    const scriptCount = usage.scripts ?? null;
-    $("scriptMetric").textContent = scriptLimit === -1 ? "Unlimited" : (scriptCount != null ? (scriptCount + " / " + scriptLimit) : "–");
-    $("scriptNote").textContent = scriptLimit === -1
-      ? "No script cap on the " + state.profile.plan + " plan."
-      : (scriptCount != null ? "Across all of your projects." : "Loading…");
+    $("usageMetric").textContent = String(usage.count || 0);
+    $("usageNote").textContent = "No cap — builds are unlimited.";
+    $("scriptMetric").textContent = "Unlimited";
+    $("scriptNote").textContent = "Create as many scripts as you like.";
   }
 
   // Pre-populate the build picker
@@ -804,26 +755,38 @@ function updateEngineNote() {
   $("engineNote").textContent = eng ? eng.tagline || "" : "";
 }
 
-function renderOptions() {
-  const opts = [
-    { id: "rename", label: "Rename identifiers" },
-    { id: "strings", label: "Encrypt strings" },
-    { id: "numbers", label: "Split numbers" },
-    { id: "junk", label: "Inject decoys" },
-    { id: "flatten", label: "Flatten control flow" },
-    { id: "harden", label: "Anti-tamper" },
-  ];
-  $("options").innerHTML = opts.map((o) => `
-    <label class="toggle ${state.options[o.id] ? "on" : ""}" data-id="${o.id}" onclick="toggleOption('${o.id}', this)">
-      <input type="checkbox" ${state.options[o.id] ? "checked" : ""}>
-      <span>${o.label}</span>
-    </label>`).join("");
+/* Prometheus protection profiles. */
+const FALLBACK_PROFILES = [
+  { id: "minify", label: "Minify", blurb: "Rename and shrink only. No VM, no runtime cost." },
+  { id: "weak", label: "Weak", blurb: "VM wrapping and an encrypted constant array." },
+  { id: "medium", label: "Medium", blurb: "String encryption, VM wrapping, shuffled constants." },
+  { id: "strong", label: "Strong", blurb: "Double VM pass, encrypted strings, mutated numbers." },
+];
+function profileList() {
+  const list = state.meta?.profiles;
+  return Array.isArray(list) && list.length ? list : FALLBACK_PROFILES;
 }
-function toggleOption(id, el) {
-  state.options[id] = !state.options[id];
-  el.classList.toggle("on", state.options[id]);
-  el.querySelector("input").checked = state.options[id];
+function renderProfilePicker() {
+  const wrap = $("profilePicker");
+  if (!wrap) return;
+  wrap.innerHTML = profileList().map((p) => `
+    <div class="engine ${state.profile === p.id ? "active" : ""}" data-id="${esc(p.id)}" onclick="pickProfile('${esc(p.id)}')">
+      <b>${esc(p.label || p.id)}</b>
+      <small>${esc(p.blurb || "")}</small>
+    </div>`).join("");
+  const current = profileList().find((p) => p.id === state.profile);
+  $("profileNote").textContent = current ? current.blurb || "" : "";
 }
+function pickProfile(id) {
+  if (!profileList().some((p) => p.id === id)) return;
+  state.profile = id;
+  renderProfilePicker();
+}
+
+$("harden").addEventListener("change", (event) => {
+  state.harden = event.target.checked;
+  $("hardenToggle").classList.toggle("on", state.harden);
+});
 
 /* ---------------------------------------------------- create / obfuscate */
 async function createScript() {
@@ -832,7 +795,7 @@ async function createScript() {
   const file = $("scriptFile").files[0];
   const btn = $("buildBtn");
   if (file) {
-    if (file.size > 2 * 1024 * 1024) return setMsg($("createMsg"), "File is over 2 MB.", "error");
+    if (file.size > 500 * 1024) return setMsg($("createMsg"), "File is over 500 KB.", "error");
     source = await file.text();
     $("source").value = source;
   }
@@ -848,13 +811,9 @@ async function createScript() {
       body: {
         name,
         source,
-        engine: state.engine || "payload",
-        rename: !!state.options.rename,
-        strings: !!state.options.strings,
-        numbers: !!state.options.numbers,
-        junk: !!state.options.junk,
-        flatten: !!state.options.flatten,
-        harden: !!state.options.harden,
+        engine: state.engine || "prometheus",
+        profile: state.profile,
+        harden: state.harden,
         key_required: $("keyRequired").checked,
         public: true,
       },
@@ -876,7 +835,7 @@ function renderResult(data) {
   const loader = data.loader || "";
   return `
     <div class="row between"><b style="color:var(--gold)">${esc(data.script.name)}</b><span class="chip gold">${esc(data.script.engineName || data.script.engine)}</span></div>
-    <div class="muted tiny" style="margin-top:6px">build <code>${esc(stats.buildId || data.script.build_id || "")}</code> · ${fmtBytes(stats.sourceBytes || 0)} → ${fmtBytes(stats.outputBytes || 0)} · ${stats.ratio || "–"}×</div>
+    <div class="muted tiny" style="margin-top:6px">build <code>${esc(stats.buildId || data.script.build_id || "")}</code>${stats.profile ? " · " + esc(stats.profile) + " profile" : ""}${stats.luaVersion ? " · " + esc(stats.luaVersion) : ""} · ${fmtBytes(stats.sourceBytes || 0)} → ${fmtBytes(stats.outputBytes || 0)} · ${stats.ratio || "–"}×</div>
     <label style="margin-top:14px">Loader URL</label>
     <div class="loader">${esc(loader)}</div>
     <div class="row" style="margin-top:10px">
@@ -964,7 +923,7 @@ function openEdit(id, name) {
   $("editTitle").textContent = "Replace source — " + name;
   $("editSource").value = "";
   $("editFile").value = "";
-  $("editEngine").value = (state.scripts.find((s) => s.id === id) || {}).engine || "payload";
+  $("editEngine").value = (state.scripts.find((s) => s.id === id) || {}).engine === "none" ? "none" : "prometheus";
   setMsg($("editMsg"), "");
   $("editPanel").classList.remove("hidden");
 }
@@ -977,7 +936,7 @@ async function saveEdit() {
   let source = $("editSource").value;
   const file = $("editFile").files[0];
   if (file) {
-    if (file.size > 2 * 1024 * 1024) return setMsg($("editMsg"), "File is over 2 MB.", "error");
+    if (file.size > 500 * 1024) return setMsg($("editMsg"), "File is over 500 KB.", "error");
     source = await file.text();
     $("editSource").value = source;
   }
@@ -989,12 +948,8 @@ async function saveEdit() {
       body: {
         source,
         engine: $("editEngine").value,
-        rename: !!state.options.rename,
-        strings: !!state.options.strings,
-        numbers: !!state.options.numbers,
-        junk: !!state.options.junk,
-        flatten: !!state.options.flatten,
-        harden: !!state.options.harden,
+        profile: state.profile,
+        harden: state.harden,
       },
     });
     setMsg($("editMsg"), "Re-obfuscated. Loader URL unchanged.", "ok");
@@ -1099,7 +1054,7 @@ async function loadInvites() {
       ? state.invites.map((i) => `
           <div class="script">
             <div class="row between">
-              <div><b style="color:var(--gold)">${esc(i.code)}</b> <span class="chip">${esc(i.kind)}</span>${i.plan ? ` <span class="chip gold">${esc(i.plan)}</span>` : ""}</div>
+              <div><b style="color:var(--gold)">${esc(i.code)}</b> <span class="chip">workspace</span></div>
               <div class="row">
                 <span class="muted tiny">${i.uses || 0}/${i.max_uses || 1} uses</span>
                 <button class="btn alt small" onclick="copyText(${JSON.stringify(i.code)})">Copy</button>
@@ -1116,8 +1071,6 @@ async function loadInvites() {
 async function createInvite() {
   try {
     const body = {
-      kind: $("inviteKind").value,
-      plan: $("inviteKind").value === "plan" ? $("invitePlan").value : null,
       max_uses: Number($("inviteUses").value) || 1,
     };
     const { data } = await api("/api/invites", { method: "POST", body });
@@ -1208,7 +1161,7 @@ async function loadAccountInfo() {
   const lines = [];
   lines.push("<b>@" + esc(state.user.username) + "</b>");
   lines.push("<br>");
-  lines.push("Plan <b style=\"color:var(--gold)\">" + esc(state.profile.plan) + "</b>");
+  lines.push("Access <b style=\"color:var(--gold)\">unlimited</b> — no plans, no billing");
   if (state.profile.role === "admin") lines.push(" · <span class=\"chip gold\">admin</span>");
   lines.push("<br>");
   lines.push("ToS version <code>" + esc(state.profile.tos_version || "—") + "</code>");
@@ -1255,7 +1208,7 @@ async function loadUsers() {
     const { data } = await api("/api/admin/users?search=" + encodeURIComponent($("userSearch").value || ""));
     const list = data.users || [];
     $("users").innerHTML = list.length
-      ? '<table><thead><tr><th>User</th><th>Plan</th><th>Status</th><th>Role</th><th>ToS</th><th></th></tr></thead><tbody>' +
+      ? '<table><thead><tr><th>User</th><th>Status</th><th>Role</th><th>ToS</th><th></th></tr></thead><tbody>' +
         list.map(renderUserRow).join("") + "</tbody></table>"
       : '<div class="muted small">No matching users.</div>';
   } catch (e) {
@@ -1266,11 +1219,6 @@ async function loadUsers() {
 function renderUserRow(u) {
   return `<tr>
     <td><b>${esc(u.username)}</b></td>
-    <td><select onchange="adminPatch('${esc(u.id)}', {plan: this.value})">
-      <option value="free" ${u.plan === "free" ? "selected" : ""}>free</option>
-      <option value="pro" ${u.plan === "pro" ? "selected" : ""}>pro</option>
-      <option value="premium" ${u.plan === "premium" ? "selected" : ""}>premium</option>
-    </select></td>
     <td><select onchange="adminPatch('${esc(u.id)}', {status: this.value})">
       <option value="active" ${u.status === "active" ? "selected" : ""}>active</option>
       <option value="suspended" ${u.status === "suspended" ? "selected" : ""}>suspended</option>

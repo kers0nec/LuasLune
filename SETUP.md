@@ -8,7 +8,7 @@ the API, and it serves protected builds from `/loader/:id`.
 ```bash
 npm install
 npm start          # http://localhost:10000
-npm test           # 65 tests, including Lua VM round trips of generated builds
+npm test           # builds every profile and runs the output in a Lua VM
 ```
 
 With no Supabase environment variables LuaLune starts in self contained mode:
@@ -66,23 +66,18 @@ Health check: `GET /healthz` → `LuaLune OK`.
 | Every account disappears after each deploy | The instance runs without Supabase, so storage is memory only. Add `SUPABASE_URL` / `SUPABASE_ANON_KEY`. |
 | "Too many sign-in attempts" | Per-IP rate limit (60 per 10 min). Wait or raise `LUALUNE_RATE_AUTH`. |
 
-### Optional: Lune Obfuscator engine (Prometheus)
+### The obfuscator (Prometheus)
 
-LuaLune ships with its own engines and works without any external bundle. To also
-offer the AST-level Lune Obfuscator engine that earlier deployments used:
+Prometheus is vendored under `vendor/prometheus` and drives every build, so there is
+nothing to install and no optional bundle to fetch. `npm install` pulls `wasmoon`, the
+WASM Lua VM that runs the engine in-process.
 
-```bash
-npm install wasmoon
-git clone https://github.com/prometheus-lua/Prometheus vendor/prometheus
-```
-
-`GET /api/meta` then reports it as available and it appears in the dashboard engine
-picker. When it is missing, a request for that engine is built with
-*LuaLune Obfuscator - Vault* and the response includes a warning explaining why.
-
-The Lune Obfuscator engine is based on Prometheus by Elias Oelschner
-(https://github.com/prometheus-lua/Prometheus, MIT); keep that attribution in place
-when you deploy it.
+`GET /api/meta` reports the engine, its presets and the attribution string. The
+vendored source carries a few LuaLune patches (marked `LuaLune patch (upstream fix
+pending)` in `vendor/prometheus/src`); see README.md for what they fix. The engine is
+used under the **Prometheus License** by Elias Oelschner
+(https://github.com/prometheus-lua/Prometheus) — not MIT — and that attribution must
+stay in place when you deploy it.
 
 ## 4. First admin
 
@@ -93,7 +88,7 @@ account in SQL:
 update public.profiles set role = 'admin' where username = 'your_username';
 ```
 
-Admins get the Admin tab: platform stats, plan and status changes, and broadcasts
+Admins get the Admin tab: platform stats, account status changes, and broadcasts
 that appear at the top of every page.
 
 ## 5. What to verify after deploying
@@ -101,11 +96,11 @@ that appear at the top of every page.
 - `GET /healthz` returns `LuaLune OK`.
 - Signing up creates an account immediately, with no CAPTCHA or application-side signup throttle.
 - Creating a script returns a loader URL, and fetching that URL returns text.
-- Each engine builds and runs: `payload`, `flow`, `vault` (and `none`).
+- Both engines build and run: `prometheus` and `none`.
 - `npm test` passes locally before you deploy — it executes generated builds in a
   Lua VM and compares their output with the original script.
 - A script marked *key required* returns a denial stub without a valid key.
-- `GET /api/meta` reports the store and auth mode in use.
+- `GET /api/meta` reports the store, auth mode, profiles, attribution and the 500 KB source cap.
 
 
 ## Supabase Auth configuration

@@ -1,18 +1,19 @@
 /**
  * LuaLune API + static host.
  *
- * Everything the dashboard talks to lives here. Routes are thin: limits come
- * from lib/plans, protection comes from lib/obfuscator, storage from lib/store.
+ * Everything the dashboard talks to lives here. Routes are thin: protection comes
+ * from lib/engines (Prometheus), storage from lib/store. LuaLune is free and
+ * unlimited, so there are no plan or quota checks on any route.
  */
 import express from "express";
 import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { obfuscate, ENGINES } from "./lib/obfuscator.js";
-import * as lune from "./lib/lune.js";
+import { buildProtected, engineName, listEngines, resolveEngine } from "./lib/engines.js";
+import * as prometheus from "./lib/prometheus.js";
 import { buildLoader, denialLoader, loaderSnippet } from "./lib/loader.js";
-import { PLANS, planFor, limit, checkLimit, monthKey, publicPlans } from "./lib/plans.js";
+import { PLAN, monthKey } from "./lib/plans.js";
 import { TOS_VERSION, tosSummary } from "./lib/tos.js";
 import { createStore } from "./lib/store.js";
 import { createAuth, normalizeUsername, isLocalEmail } from "./lib/auth.js";
@@ -76,7 +77,6 @@ async function authed(req, res, next) {
   req.token = token;
   req.user = user;
   req.profile = profile;
-  req.plan = profile.plan || "free";
   next();
 }
 
@@ -90,50 +90,16 @@ function adminOnly(req, res, next) {
 }
 
 /**
- * Build a protected script. The optional Lune Obfuscator engine (Prometheus in a
- * WASM VM) is used when it is installed; otherwise the same request is served by
- * LuaLune's own Vault engine and the response says so.
+ * Build options for a request. Prometheus profiles are validated in
+ * lib/prometheus (unknown names fall back to Medium), and the Lua version is
+ * checked there too, so a bad value surfaces as a 400 from the route.
  */
-async function buildProtected(source, options) {
-  if (options.engine !== "lune") return obfuscate(source, options);
-  if (await lune.available()) {
-    const code = await lune.obfuscate(source, { preset: options.preset || "medium", antiTamper: options.harden !== false });
-    return {
-      code,
-      engine: "lune",
-      warnings: [],
-      stats: {
-        engine: "lune",
-        engineName: ENGINES.lune.name,
-        buildId: crypto.randomBytes(6).toString("hex"),
-        sourceBytes: Buffer.byteLength(source, "utf8"),
-        outputBytes: Buffer.byteLength(code, "utf8"),
-        ratio: +(Buffer.byteLength(code) / Math.max(1, Buffer.byteLength(source, "utf8"))).toFixed(2),
-        passes: ["ast-transform", "anti-tamper"],
-      },
-    };
-  }
-  const built = obfuscate(source, { ...options, engine: "vault" });
-  built.warnings = [
-    ...built.warnings,
-    "The Lune Obfuscator engine is not installed on this instance, so this build was made with LuaLune Obfuscator - Vault instead.",
-  ];
-  return built;
-}
-
 function obfuscatorOptions(req) {
-  const engine = ENGINES[req.body?.engine] ? req.body.engine : "payload";
   return {
-    engine,
-    rename: req.body?.rename !== false,
-    strings: req.body?.strings !== false,
-    numbers: req.body?.numbers !== false,
-    junk: req.body?.junk !== false,
-    flatten: req.body?.flatten !== false,
+    engine: resolveEngine(req.body?.engine),
+    profile: req.body?.profile || req.body?.preset,
     harden: req.body?.harden !== false,
-    preset: ["minify", "weak", "light", "medium", "balanced", "strong", "heavy", "maximum"].includes(String(req.body?.preset || "").toLowerCase())
-      ? String(req.body.preset).toLowerCase()
-      : "medium",
+    luaVersion: req.body?.luaVersion ?? req.body?.lua_version,
   };
 }
 
@@ -155,21 +121,25 @@ async function ensureTos(req, res) {
 app.get("/healthz", (_, res) => res.type("text").send("LuaLune OK\n"));
 
 app.get("/api/meta", async (_, res) => {
-  const luneReady = await lune.available();
+  const prometheusReady = await prometheus.available();
   res.json({
     ...BRAND,
     authAutoConfirm: auth.adminReady,
-    engines: Object.values(ENGINES).map((engine) => ({
+    engines: listEngines().map((engine) => ({
       ...engine,
-      available: engine.external ? luneReady : true,
-      ...(engine.external && !luneReady ? { unavailableReason: lune.unavailableReason() } : {}),
+      available: engine.id === "prometheus" ? prometheusReady : true,
+      ...(engine.id === "prometheus" && !prometheusReady ? { unavailableReason: prometheus.unavailableReason() } : {}),
     })),
-    plans: publicPlans(),
+    profiles: prometheus.profiles(),
+    defaultEngine: "prometheus",
+    defaultProfile: prometheus.DEFAULT_PROFILE,
+    attribution: prometheus.ATTRIBUTION,
+    engineUpstream: prometheus.UPSTREAM,
+    maxSourceBytes: prometheus.MAX_SOURCE_BYTES,
+    unlimited: true,
     tosVersion: TOS_VERSION,
   });
 });
-
-app.get("/api/plans", (_, res) => res.json({ plans: publicPlans(), billing: "one-time payment" }));
 
 app.get("/api/tos", (_, res) => res.json(tosSummary()));
 
@@ -238,7 +208,7 @@ app.get("/api/auth/me", authed, async (req, res) => {
   res.json({
     user: req.user,
     profile: publicProfile(req.profile),
-    usage: { ...usage, limit: limit(req.plan, "obfuscationsPerMonth") },
+    usage: { ...usage, limit: -1 },
     tosUpdateRequired: req.profile.tos_version !== TOS_VERSION,
   });
 });
@@ -260,7 +230,8 @@ function publicProfile(profile) {
     id: profile.id,
     username: profile.username,
     email: isLocalEmail(profile.email) ? null : profile.email,
-    plan: profile.plan || "free",
+    // Every account is on the single unlimited plan; the stored column is legacy.
+    plan: PLAN.id,
     role: profile.role || "user",
     status: profile.status || "active",
     suspended_until: profile.suspended_until || null,
@@ -289,15 +260,9 @@ app.post("/api/scripts", authed, buildLimiter, async (req, res) => {
   const source = typeof req.body?.source === "string" ? req.body.source : "";
   if (name.length < 1 || name.length > 80) return fail(res, 400, "Name must be 1-80 characters.");
   if (source.length < 1) return fail(res, 400, "Script source is required.");
-  if (Buffer.byteLength(source) > 2 * 1024 * 1024) return fail(res, 400, "Script must be under 2 MB.");
+  if (Buffer.byteLength(source) > prometheus.MAX_SOURCE_BYTES) return fail(res, 400, "Script must be under 500 KB.");
 
   const options = obfuscatorOptions(req);
-  const count = await store.countScripts(req.user.id);
-  const scriptsCheck = checkLimit(req.plan, "scripts", count);
-  if (!scriptsCheck.allowed) return fail(res, 402, scriptsCheck.reason, { upgrade: true });
-  const usage = await store.getUsage(req.user.id);
-  const usageCheck = checkLimit(req.plan, "obfuscationsPerMonth", 0, usage.month, usage);
-  if (!usageCheck.allowed) return fail(res, 402, usageCheck.reason, { upgrade: true });
 
   let built;
   try {
@@ -342,11 +307,7 @@ app.post("/api/scripts/:id/rebuild", authed, buildLimiter, async (req, res) => {
   if (!script || script.owner_id !== req.user.id) return fail(res, 404, "Script not found.");
   const source = typeof req.body?.source === "string" ? req.body.source : "";
   if (!source) return fail(res, 400, "Script source is required.");
-  if (Buffer.byteLength(source) > 2 * 1024 * 1024) return fail(res, 400, "Script must be under 2 MB.");
-
-  const usage = await store.getUsage(req.user.id);
-  const usageCheck = checkLimit(req.plan, "obfuscationsPerMonth", 0, usage.month, usage);
-  if (!usageCheck.allowed) return fail(res, 402, usageCheck.reason, { upgrade: true });
+  if (Buffer.byteLength(source) > prometheus.MAX_SOURCE_BYTES) return fail(res, 400, "Script must be under 500 KB.");
 
   let built;
   try {
@@ -400,14 +361,13 @@ app.get("/api/scripts/:id/view", authed, async (req, res) => {
     buildId: script.build_id,
     engine: script.engine,
     scriptId: script.id,
-    engineName: ENGINES[script.engine]?.name,
+    engineName: engineName(script.engine),
   }));
 });
 
 app.get("/api/scripts/:id/logs", authed, async (req, res) => {
   const script = await store.getScript(req.params.id);
   if (!script || script.owner_id !== req.user.id) return fail(res, 404, "Script not found.");
-  if (req.plan === "free") return fail(res, 402, "Execution logs are available on Pro and Premium.", { upgrade: true });
   const logs = await store.listLogs(script.id, Math.min(Number(req.query.limit) || 25, 100));
   res.json({ logs });
 });
@@ -417,7 +377,7 @@ function scriptSummary(script) {
     id: script.id,
     name: script.name,
     engine: script.engine,
-    engineName: ENGINES[script.engine]?.name || script.engine,
+    engineName: engineName(script.engine),
     build_id: script.build_id,
     source_bytes: script.source_bytes,
     output_bytes: script.output_bytes,
@@ -457,10 +417,6 @@ app.get("/api/keys", authed, async (req, res) => {
 });
 
 app.post("/api/keys", authed, async (req, res) => {
-  const count = await store.countKeys(req.user.id);
-  const check = checkLimit(req.plan, "keys", count);
-  if (!check.allowed) return fail(res, 402, check.reason, { upgrade: true });
-
   const duration = KEY_DURATIONS.find((d) => d.id === req.body?.duration) || KEY_DURATIONS[1];
   const amount = Math.min(Math.max(Number(req.body?.amount) || 1, 1), 50);
   const scriptId = req.body?.script_id || null;
@@ -505,7 +461,7 @@ app.get("/api/whitelist", authed, async (req, res) => {
   const script = await store.getScript(scriptId);
   if (!script || script.owner_id !== req.user.id) return fail(res, 404, "Script not found.");
   const entries = await store.listWhitelist(scriptId);
-  res.json({ entries, limit: limit(req.plan, "whitelistPerScript") });
+  res.json({ entries, limit: -1 });
 });
 
 app.post("/api/whitelist", authed, async (req, res) => {
@@ -514,9 +470,6 @@ app.post("/api/whitelist", authed, async (req, res) => {
   if (!script || script.owner_id !== req.user.id) return fail(res, 404, "Script not found.");
   const hwid = String(req.body?.hwid || "").trim();
   if (hwid.length < 4 || hwid.length > 128) return fail(res, 400, "HWID must be 4-128 characters.");
-  const current = await store.countWhitelist(scriptId);
-  const check = checkLimit(req.plan, "whitelistPerScript", current);
-  if (!check.allowed) return fail(res, 402, check.reason, { upgrade: true });
   const entry = await store.addWhitelist({ script_id: scriptId, owner_id: req.user.id, hwid, label: String(req.body?.label || "").slice(0, 60) });
   res.status(201).json({ entry });
 });
@@ -540,12 +493,10 @@ app.get("/api/invites", authed, async (req, res) => {
 });
 
 app.post("/api/invites", authed, async (req, res) => {
-  const kind = req.body?.kind === "plan" ? "plan" : "workspace";
   const invite = await store.createInvite({
     owner_id: req.user.id,
     code: inviteCode(),
-    kind,
-    plan: kind === "plan" && PLANS[req.body?.plan] ? req.body.plan : null,
+    kind: "workspace",
     max_uses: Math.min(Math.max(Number(req.body?.max_uses) || 1, 1), 100),
   });
   res.status(201).json({ invite });
@@ -563,11 +514,7 @@ app.post("/api/invites/redeem", authed, async (req, res) => {
   const invite = await store.getInviteByCode(code);
   if (!invite) return fail(res, 404, "That invite code is not valid.");
   if (invite.uses >= (invite.max_uses || 1)) return fail(res, 409, "That invite code has been used up.");
-  if (invite.kind === "plan" && invite.plan) {
-    await store.updateProfile(req.user.id, { plan: invite.plan });
-    await store.useInvite(code, req.user.id);
-    return res.json({ ok: true, plan: invite.plan, message: `Invite applied. You are on the ${planFor(invite.plan).name} plan.` });
-  }
+  // Codes created before plans were removed still redeem as workspace access.
   const share = await store.createShare({
     owner_id: invite.owner_id,
     owner_username: req.profile.username,
@@ -587,9 +534,6 @@ app.post("/api/shares", authed, async (req, res) => {
   const target = normalizeUsername(req.body?.username);
   if (!target) return fail(res, 400, "Enter a username to share with.");
   if (target === req.user.username) return fail(res, 400, "That is your own account.");
-  const current = await store.listSharesByOwner(req.user.id);
-  const check = checkLimit(req.plan, "shares", current.length);
-  if (!check.allowed) return fail(res, 402, check.reason, { upgrade: true });
   const scriptId = req.body?.script_id || null;
   if (scriptId) {
     const script = await store.getScript(scriptId);
@@ -622,7 +566,6 @@ app.get("/api/admin/users", authed, adminOnly, async (req, res) => {
 
 app.patch("/api/admin/users/:id", authed, adminOnly, async (req, res) => {
   const patch = {};
-  if (PLANS[req.body?.plan]) patch.plan = req.body.plan;
   if (["active", "suspended", "terminated"].includes(req.body?.status)) {
     patch.status = req.body.status;
     patch.suspended_until = req.body?.suspended_until || null;
@@ -668,7 +611,7 @@ app.get("/loader/:id", loaderLimiter, async (req, res) => {
       buildId: script.build_id,
       engine: script.engine,
       scriptId: script.id,
-      engineName: ENGINES[script.engine]?.name,
+      engineName: engineName(script.engine),
     }));
   };
 

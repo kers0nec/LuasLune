@@ -9,7 +9,8 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
   username text not null unique,
-  plan text not null default 'free' check (plan in ('free','pro','premium')),
+  -- Legacy column: LuaLune is free and unlimited, every account is on one plan.
+  plan text not null default 'unlimited' check (plan in ('free','pro','premium','unlimited')),
   role text not null default 'user' check (role in ('user','admin')),
   status text not null default 'active' check (status in ('active','suspended','terminated')),
   suspended_until timestamptz,
@@ -102,8 +103,9 @@ create table if not exists public.invites (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references auth.users(id) on delete cascade,
   code text not null unique,
+  -- 'plan' invites are retired; old rows still redeem as workspace access.
   kind text not null default 'workspace' check (kind in ('workspace','plan')),
-  plan text check (plan in ('free','pro','premium')),
+  plan text check (plan in ('free','pro','premium','unlimited')),
   max_uses integer not null default 1,
   uses integer not null default 0,
   last_used_by uuid references auth.users(id) on delete set null,

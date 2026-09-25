@@ -1,9 +1,9 @@
 {
   "name": "lualune",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "private": true,
-  "description": "LuaLune — gold glass Lua/Luau obfuscation, script delivery and licensing dashboard.",
+  "description": "LuaLune — free and unlimited Lua/Luau protection studio built on the Prometheus obfuscator.",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
@@ -15,7 +15,9 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.117.1",
     "express": "^5.2.1",
-    "fengari": "^0.1.5",
     "wasmoon": "^1.16.0"
+  },
+  "devDependencies": {
+    "fengari": "^0.1.5"
   }
 }

@@ -1,10 +1,11 @@
 # LuaLune
 
-Luau/Lua protection platform built around the **LuaLune Obfuscator**.
+Luau/Lua protection platform built around the **Prometheus obfuscator**.
 
 LuaLune takes a Lua or Luau script, protects it, and hands back a loader URL you can
-paste into any executor. It ships with accounts, plans, a key system, HWID
-whitelisting, execution logs, workspace sharing and an admin console.
+paste into any executor. It ships with accounts, a key system, HWID whitelisting,
+execution logs, workspace sharing and an admin console. Every account is unlimited:
+no plans, no quotas and nothing to buy.
 
 ```
 loadstring(game:HttpGet("https://<your-domain>/loader/<script-id>"))()
@@ -16,57 +17,55 @@ loadstring(game:HttpGet("https://<your-domain>/loader/<script-id>"))()
 
 | Engine | What it does |
 | --- | --- |
-| **LuaLune Obfuscator** (`payload`) | Encrypts the whole chunk (Park–Miller keystream, per-build seed), splits the ciphertext into shuffled segments, ships a randomized runtime decoder, verifies an Adler-style integrity checksum before decoding and rebuilds the chunk in memory with `loadstring`. Best speed/size trade-off. |
-| **LuaLune Obfuscator - Flow** (`flow`) | Source-to-source: scope-aware identifier renaming, control-flow flattening, encrypted string tables in two shuffled pools with decoys, split number literals and dead-code injection. Output stays valid Luau, so it also runs on Luau-only executors. |
-| **LuaLune Obfuscator - Vault** (`vault`) | Strongest build. Three cascaded transforms (keystream xor → 3-bit rotate → additive stream), per-segment checksums, decoy records mixed into the pool, a magic marker checked after decoding, and no `bit32` dependency at all. |
-| **Lune Obfuscator** (`lune`) | Optional AST-level engine: Prometheus by Elias Oelschner running inside a WASM Lua VM. Install the bundle (below) to enable it; without it, requests for this engine are built with Vault and the response says so. |
-| **None** | Stores the script untouched (useful for diffing engines or shipping open source scripts). |
+| **Prometheus** (`prometheus`) | The AST-level obfuscator by Elias Oelschner, vendored under `vendor/prometheus` and driven by a WASM Lua VM. Default engine. |
+| **None** (`none`) | Stores the script untouched, for open source scripts or diffing a build. |
 
-### Enabling the Lune Obfuscator engine (optional)
+The older LuaLune engines (payload, flow, vault) are gone. Existing scripts that
+reference them are rebuilt with Prometheus, and legacy engine ids still resolve to it.
 
-```bash
-npm install wasmoon
-git clone https://github.com/prometheus-lua/Prometheus vendor/prometheus
-```
+### Presets
 
-`/api/meta` reports `available: true/false` per engine, and the dashboard only offers
-the engine when it is installed.
+| Profile | Steps (in order) | Notes |
+| --- | --- | --- |
+| `minify` | — | Source cleanup only. |
+| `weak` | EncryptStrings, Vmify, ConstantArray, NumbersToExpressions, WrapInFunction | Fast builds, small output. |
+| `medium` (default) | EncryptStrings, AntiTamper, Vmify, ConstantArray, NumbersToExpressions, WrapInFunction | The default balance of speed and strength. |
+| `strong` | Vmify, EncryptStrings, AntiTamper, Vmify, ConstantArray, NumbersToExpressions, WrapInFunction | Can be 50x slower; use it for small, hot-path-free scripts. |
 
-> The Lune Obfuscator engine is based on **Prometheus** by Elias Oelschner
-> (https://github.com/prometheus-lua/Prometheus, MIT). LuaLune's own engines
-> (payload / flow / vault) are original work and need no external bundle.
+Aliases (`light` → weak, `balanced` → medium, `heavy`/`maximum` → strong) and unknown
+profile ids all keep working. Builds are randomized: pass `seed` to get a reproducible
+build (used by the tests), otherwise every build differs.
 
-### Protections shared by the encrypted engines
+`luaVersion` picks the target dialect: `LuaU` (default, what executors run) or
+`Lua51`. Hardening (`harden`, on by default) adds Prometheus' `AntiTamper` step, whose
+builds are meant to run inside Roblox/executors rather than plain Lua.
 
-- **Nibble-table xor** — generated builds carry a shifted 256-byte xor table that is
-  rebuilt at runtime, so payloads never rely on the executor's `bit32` (some ship it
-  broken, some do not ship it at all) and the decoder is pure arithmetic.
-- **Environment guard** (`harden`, on by default) — the build self-tests the builtins it
-  depends on (`string.char`, `string.byte`, `table.concat`, `math.fmod`, `math.floor`,
-  `loadstring`/`load`) and refuses to run when they have been replaced by something that
-  lies. Honest wrappers pass; a hooked environment does not.
-- **Integrity checks** — a global checksum for `payload`, per-segment checksums for
-  `vault`, each compared as two 16-bit halves so the maths is exact on any Lua integer
-  width and tampering fails closed with a clear error.
-- **Randomized builds** — new seeds, new table layout, new identifier names and a new
-  build id every time, so two builds of the same script never match.
+### Vendor patches
 
-Every pass is conservative. If a construct cannot be transformed without risking a
-behaviour change (repeat/until, goto, Luau if-expressions, top-level varargs,
-shadowed globals, `<const>` attributes) the pass disables itself and the build is
-returned with a warning instead of a broken script.
+The vendored Prometheus source carries a few LuaLune patches, each marked with a
+`LuaLune patch (upstream fix pending)` comment:
 
-The engine never claims to be more than it is: obfuscation raises the cost of
-reading your source, it is not encryption for secrets. Do not put API keys inside
-a script you protect.
-
----
+- `prometheus/steps/NumbersToExpressions.lua` — the step verified its generated
+  expressions with the host VM's exact 64-bit integers, while the emitted code runs
+  in Lua 5.1/Luau where numbers are doubles. Any expression whose intermediate values
+  passed 2^53 therefore checked out in the host and still evaluated differently at
+  runtime, which made a share of builds decode their own strings into garbage. The
+  checks now force double arithmetic (`toDouble(n) = n + 0.0`), and number
+  representations are only rewritten when the target's doubles hold the value exactly.
+- `prometheus/steps/NumbersToExpressions.lua` — the scientific representation used
+  `%.15g`, which cannot round-trip every double; it now uses `%.17g` and falls back to
+  the plain literal when the round-trip fails.
+- `prometheus/unparser.lua` — number literals were printed with `tostring`, i.e. the
+  host's `%.14g`, silently truncating any literal with more than 14 significant digits
+  (3.3333333333333335 became 3.3333). Values that do not survive `tostring` are now
+  re-emitted with `%.17g`.
 
 ## Quick start
 
 ```bash
 npm install
 npm start          # http://localhost:10000
+npm test           # builds every profile and runs the output in a Lua VM
 ```
 
 Without `SUPABASE_URL` / `SUPABASE_ANON_KEY` LuaLune runs fully self contained:
@@ -74,10 +73,6 @@ accounts, sessions and data live in memory, but auth accounts and session
 signing are persisted to `data/auth-local.json`, so logins keep working across
 restarts (set `LUALUNE_DATA_DIR` to move that file). Configure Supabase to make
 everything else persistent too.
-
-```bash
-npm test           # 65 tests: obfuscator, protections, auth, API, fuzz round trips through a Lua VM
-```
 
 ### Environment
 
@@ -91,6 +86,9 @@ npm test           # 65 tests: obfuscator, protections, auth, API, fuzz round tr
 | `LUALUNE_DOMAIN` | Domain shown in metadata and used for log hashing salt. |
 | `LUALUNE_ADMINS` | Comma separated emails that always get admin access. |
 | `LUALUNE_RATE_AUTH` / `LUALUNE_RATE_BUILD` / `LUALUNE_RATE_LOADER` | Per-window limits for sign-in/password-reset attempts (60 / 10 min), builds (30 / min) and loader requests (240 / min). Signup is not rate limited by LuaLune. |
+
+Source files may be up to 500 KB — the limit of the Prometheus engine, advertised by
+`GET /api/meta` as `maxSourceBytes`.
 
 ### Sign-in troubleshooting
 
@@ -111,8 +109,8 @@ npm test           # 65 tests: obfuscator, protections, auth, API, fuzz round tr
 | Method | Route | Notes |
 | --- | --- | --- |
 | `GET` | `/healthz` | Health check → `LuaLune OK`. |
-| `GET` | `/api/meta` | Brand, engines, plans, terms version. |
-| `GET` | `/api/plans`, `/api/tos`, `/api/announcements` | Public catalogue. |
+| `GET` | `/api/meta` | Brand, engines, profiles, attribution, source cap, terms version. |
+| `GET` | `/api/tos`, `/api/announcements` | Public documents. |
 | `POST` | `/api/auth/signup`, `/api/auth/login` | Username + password (email optional). |
 | `GET` | `/api/auth/me`, `POST /api/auth/logout` | Session. |
 | `POST` | `/api/tos/accept` | Accept the current terms version. |
@@ -120,12 +118,12 @@ npm test           # 65 tests: obfuscator, protections, auth, API, fuzz round tr
 | `GET/PATCH/DELETE` | `/api/scripts/:id` | Read metadata, rename, toggle public, delete. |
 | `POST` | `/api/scripts/:id/rebuild` | Re-obfuscate new source; the loader URL stays the same. |
 | `GET` | `/api/scripts/:id/view` | The protected build as text (owner only). |
-| `GET` | `/api/scripts/:id/logs` | Execution logs (Pro/Premium). |
+| `GET` | `/api/scripts/:id/logs` | Execution logs. |
 | `GET/POST/DELETE` | `/api/keys` | Key system: `?duration=test\|1d\|3d\|7d\|30d\|forever`. |
 | `GET/POST/DELETE` | `/api/whitelist` | HWID whitelist per script. |
-| `GET/POST/DELETE` | `/api/invites`, `/api/invites/redeem` | Invite codes for workspace access or plan upgrades. |
-| `GET/POST/DELETE` | `/api/shares` | Workspace sharing (Pro/Premium). |
-| `GET` | `/api/admin/*` | Stats, users, plan/status changes, broadcasts. |
+| `GET/POST/DELETE` | `/api/invites`, `/api/invites/redeem` | Invite codes for workspace access. |
+| `GET/POST/DELETE` | `/api/shares` | Workspace sharing. |
+| `GET` | `/api/admin/*` | Stats, users, broadcast announcements. |
 | `GET` | `/loader/:id?key=...&hwid=...` | What executors fetch. Runs the key, HWID and status checks, then returns the build. |
 
 `loader/:id` answers with a plain-text Lua file in every case — a denial is a small
@@ -133,37 +131,23 @@ stub that calls `error()`, so an executor never sees a HTML error page.
 
 ---
 
-## Plans
-
-| | Free | Pro ($6) | Premium ($14) |
-| --- | --- | --- | --- |
-| Scripts | 3 | 25 | unlimited |
-| Builds / month | 25 | 500 | unlimited |
-| Keys | 5 | 100 | unlimited |
-| HWID entries / script | 25 | 250 | unlimited |
-| Execution logs | — | yes | yes |
-| Workspace sharing | — | yes | yes |
-
-One-time payment per tier, monthly build counters, limits enforced server side.
-
----
-
 ## Layout
 
 ```
-server.js            Express API, loader endpoint, static host
-lib/obfuscator.js    the LuaLune Obfuscator (lexer, passes, payload engine)
-lib/plans.js         plan catalogue and limit checks
-lib/loader.js        loader banners, snippets and denial stubs
-lib/ratelimit.js     fixed window rate limiting (api, builds, loader)
-lib/lune.js          optional Lune Obfuscator (Prometheus) engine + attribution
-lib/auth.js          Supabase auth or built-in scrypt auth
-lib/store.js         memory or Supabase storage adapter
-lib/tos.js           terms of service text and version
-index.html           gold themed single page app
-styles.css           theme
-tests/               node:test suites incl. a Lua VM round-trip harness
-schema.sql           Supabase schema + row level security
+server.js              Express API, loader endpoint, static host
+lib/prometheus.js      vendored Prometheus driver (WASM Lua VM), profiles, seeds, attribution
+lib/engines.js         engine registry: prometheus + none, legacy ids -> prometheus
+lib/plans.js           the single unlimited plan
+lib/loader.js          loader banners, snippets and denial stubs
+lib/ratelimit.js       fixed window rate limiting (api, builds, loader)
+lib/auth.js            Supabase auth or built-in scrypt auth
+lib/store.js           memory or Supabase storage adapter
+lib/tos.js             terms of service text and version
+vendor/prometheus/src  the engine itself (Prometheus License, see CREDITS)
+index.html             gold themed single page app
+styles.css             theme
+tests/                 node:test suites incl. a Lua VM round-trip harness
+schema.sql             Supabase schema + row level security
 ```
 
 ## Hardening
@@ -181,21 +165,27 @@ schema.sql           Supabase schema + row level security
 `tests/luavm.js` embeds a Lua 5.3 VM (fengari) so every generated build is
 actually executed and its printed output is compared against the original script.
 
-- `obfuscator.test.js` — lexer, passes, engine catalogue, tamper detection.
-- `fuzz.test.js` — eleven construct-heavy scripts (closures, methods, tables,
-  recursion, varargs, shadowing, split declarations) through **every engine** with
-  the passes toggled on and off.
-- `protection.test.js` — vault round trips, `bit32`-free builds, xor table
-  correctness, per-segment tamper detection, environment guard behaviour.
-- `api.test.js` / `ratelimit.test.js` — the HTTP surface end to end.
-- `lune.test.js` — the optional engine's availability reporting, the anti-tamper
-  wrapper's validity as Lua, and the Vault fallback when the bundle is missing.
+- `prometheus.test.js` — profile mapping, build output, anti-tamper, vendor health,
+  and a regression test pinning the seeds that used to corrupt builds.
+- `api.test.js` — the HTTP surface end to end: accounts, scripts, keys, whitelist,
+  invites, shares, logs, loader denials and the unlimited-usage contract.
+- `auth.test.js` / `ratelimit.test.js` — sign-in flows and the per-IP limiters.
 
-## Credits
+## Credits and license
 
-- LuaLune Obfuscator engines, platform and dashboard: this repository.
-- Lune Obfuscator engine (optional): Prometheus by Elias Oelschner,
-  https://github.com/prometheus-lua/Prometheus — MIT.
+- LuaLune platform, dashboard and engine integration: this repository.
+- The obfuscator is **Prometheus** by Elias Oelschner,
+  https://github.com/prometheus-lua/Prometheus, used under the **Prometheus
+  License** (not MIT). LuaLune ships a patched copy in `vendor/prometheus`; the
+  patches are documented above, and the required attribution appears in
+  `GET /api/meta`, in the dashboard footer and in the header of every build:
+
+  ```
+  Based on Prometheus by Elias Oelschner, https://github.com/prometheus-lua/Prometheus
+  ```
+
+- Obfuscated *output* carries no license notice requirement; only the engine source
+  and its derivatives do.
 
 ## Legal
 
